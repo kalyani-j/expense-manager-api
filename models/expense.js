@@ -9,13 +9,12 @@ const expenseSchema = new Schema(
     expense_category: {
       type: String,
     },
-    
-        currency_type: {
-            type: String,
-        },
+    currency_type: {
+      type: String,
+    },
     expense_amount: {
-        type: Number,
-    }
+      type: Number,
+    },
   },
   {
     timestamps: true,
