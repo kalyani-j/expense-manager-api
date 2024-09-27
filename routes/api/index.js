@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const expenseRoutes =  require('./expense');
 
-router.use('/expense', expenseRoutes);
+router.use('/expenses', expenseRoutes);
 
 module.exports = router;

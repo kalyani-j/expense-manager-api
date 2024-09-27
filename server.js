@@ -1,6 +1,6 @@
 const express = require('express');
 const connectDB = require('./db');
-
+const routes = require('./routes');
 const app = express();
 const PORT = 3000;
 
@@ -14,6 +14,8 @@ app.listen(PORT, (error) => {
     console.error(error.message);
   }
 });
+
+app.use(routes);
 
 app.get('/', (req, res) => {
   res.status(200);

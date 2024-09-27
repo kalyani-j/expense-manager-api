@@ -2,13 +2,29 @@ const router = require('express').Router();
 const Expense = require('../../models/expense');
 
 //Get expenses
-
+/**
+ * @desc Get all expenses
+ */
 router.get('/', async (req, res) => {
     try {
-        const expenses = await Expense.find();
+        let result;
 
-        if(expenses) {
-            res.status(200).send(expenses);
+        const category = req.query.category;
+        const currency = req.query.currency;
+
+        if(category) {
+            result = await Expense.find({expense_category: category});
+        }
+        
+        if(currency) {
+            result = await Expense.find({currency_type: currency});
+        } else {
+            result = await Expense.find();
+        }
+         
+
+        if(result) {
+            res.status(200).send(result);
         } else {
             res.status(404).send('No expenses available');
         }
