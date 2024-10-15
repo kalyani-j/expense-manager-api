@@ -60,4 +60,45 @@ router.put('/', async (req, res) => {
   }
 });
 
+/**
+ * @desc Create an expense
+ */
+router.post('/', async (req, res) => {
+try {
+    const result = await Expense.create(req.body);
+
+    if(result) {
+        res.status(201).send('Expense successfully added.');
+    } else   {
+        res.status(404).send('Expense not added.');
+    }
+} catch (e) {
+    res.send(e.message);
+}
+
+
+})
+
+
+/**
+ * @desc delete an expense by ID
+ */
+router.delete('/:id', async (req, res) => {
+  try {
+   
+    const result = await Expense.findByIdAndDelete({ _id: req.params.id });
+
+    if (result) {
+      res.status(201).json({success: true, data: {}})
+    //   ('Expense successfully deleted.');
+    } else {
+      res.status(404).send('Expense not found.');
+    }
+  } catch (e) {
+    res.status(500).send('Error on deleting expense.');
+  }
+});
+
+
+
 module.exports = router;
