@@ -3,6 +3,9 @@ const Schema = mongoose.Schema;
 
 const expenseSchema = new Schema(
   {
+    expense_date:{ 
+      type: Date,
+    },
     expense_name: {
       type: String,
     },

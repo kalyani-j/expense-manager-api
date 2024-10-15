@@ -1,6 +1,7 @@
 const express = require('express');
 const connectDB = require('./db');
 const routes = require('./routes');
+const bodyParser = require('body-parser');
 const app = express();
 const PORT = 3000;
 
@@ -15,6 +16,10 @@ app.listen(PORT, (error) => {
   }
 });
 
+//Body parser
+app.use(express.json());
+
+// Routes
 app.use(routes);
 
 app.get('/', (req, res) => {
