@@ -11,7 +11,7 @@ router.get('/', async (req, res) => {
 
     const category = req.query.category;
     const currency = req.query.currency;
-    const date = req.query.date;
+    const expDate = req.query.date;
 
     if (category) {
       result = await Expense.find({ expense_category: category });
@@ -22,10 +22,12 @@ router.get('/', async (req, res) => {
     }
 
     if (date) {
-      result = await Expense.find({ currency_type: currency });
+      result = await Expense.find({ expense_date: expDate});
     } else {
       result = await Expense.find();
     }
+
+
 
     if (result) {
       res.status(200).send(result);
@@ -36,6 +38,44 @@ router.get('/', async (req, res) => {
     res.status(500).send('Error on fetching expenses.');
   }
 });
+
+    //aggregation pipeline
+    /**
+     * @description Get total expenses by:
+     *      - Date
+     *      - Category
+     *      - Currency
+     * @path /api/expenses/aggregate?group=currency_type
+     */
+
+    router.get('/aggregate', async(req, res) => {
+        try {
+
+            const groupParam = req.query.group;
+            const result = await Expense.aggregate(
+                [
+                    {
+                      '$group': {
+                        '_id': `$${groupParam}`, 
+                        'total_expense': {
+                          '$sum': '$expense_amount'
+                        }
+                      }
+                    }
+                  ]
+            )
+                
+
+
+            if(result) {
+                res.status(200).send(result);
+            } else {
+                res.status(404).send('Aggregation error.')
+            }
+        } catch (e) {
+            res.status(500).send('Error on fetching expenses.');
+          }
+    })
 
 /**
  * @desc Update an expense by ID
@@ -64,20 +104,18 @@ router.put('/', async (req, res) => {
  * @desc Create an expense
  */
 router.post('/', async (req, res) => {
-try {
+  try {
     const result = await Expense.create(req.body);
 
-    if(result) {
-        res.status(201).send('Expense successfully added.');
-    } else   {
-        res.status(404).send('Expense not added.');
+    if (result) {
+      res.status(201).send('Expense successfully added.');
+    } else {
+      res.status(404).send('Expense not added.');
     }
-} catch (e) {
+  } catch (e) {
     res.send(e.message);
-}
-
-
-})
+  }
+});
 
 
 /**
@@ -85,12 +123,11 @@ try {
  */
 router.delete('/:id', async (req, res) => {
   try {
-   
     const result = await Expense.findByIdAndDelete({ _id: req.params.id });
 
     if (result) {
-      res.status(201).json({success: true, data: {}})
-    //   ('Expense successfully deleted.');
+      res.status(201).json({ success: true, data: {} });
+      //   ('Expense successfully deleted.');
     } else {
       res.status(404).send('Expense not found.');
     }
@@ -98,7 +135,5 @@ router.delete('/:id', async (req, res) => {
     res.status(500).send('Error on deleting expense.');
   }
 });
-
-
 
 module.exports = router;
