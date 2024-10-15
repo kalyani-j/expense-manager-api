@@ -56,6 +56,9 @@ router.get('/aggregate', async (req, res) => {
           total_expense: {
             $sum: '$expense_amount',
           },
+          avg_expense: {
+            $avg:'$expense_amount',
+          }
         },
       },
     ]);
