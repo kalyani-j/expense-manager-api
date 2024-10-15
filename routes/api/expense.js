@@ -22,12 +22,10 @@ router.get('/', async (req, res) => {
     }
 
     if (date) {
-      result = await Expense.find({ expense_date: expDate});
+      result = await Expense.find({ expense_date: expDate });
     } else {
       result = await Expense.find();
     }
-
-
 
     if (result) {
       res.status(200).send(result);
@@ -39,43 +37,38 @@ router.get('/', async (req, res) => {
   }
 });
 
-    //aggregation pipeline
-    /**
-     * @description Get total expenses by:
-     *      - Date
-     *      - Category
-     *      - Currency
-     * @path /api/expenses/aggregate?group=currency_type
-     */
+//aggregation pipeline
+/**
+ * @description Get total expenses by:
+ *      - Date
+ *      - Category
+ *      - Currency
+ * @path /api/expenses/aggregate?group=currency_type
+ */
 
-    router.get('/aggregate', async(req, res) => {
-        try {
+router.get('/aggregate', async (req, res) => {
+  try {
+    const groupParam = req.query.group;
+    const result = await Expense.aggregate([
+      {
+        $group: {
+          _id: `$${groupParam}`,
+          total_expense: {
+            $sum: '$expense_amount',
+          },
+        },
+      },
+    ]);
 
-            const groupParam = req.query.group;
-            const result = await Expense.aggregate(
-                [
-                    {
-                      '$group': {
-                        '_id': `$${groupParam}`, 
-                        'total_expense': {
-                          '$sum': '$expense_amount'
-                        }
-                      }
-                    }
-                  ]
-            )
-                
-
-
-            if(result) {
-                res.status(200).send(result);
-            } else {
-                res.status(404).send('Aggregation error.')
-            }
-        } catch (e) {
-            res.status(500).send('Error on fetching expenses.');
-          }
-    })
+    if (result) {
+      res.status(200).send(result);
+    } else {
+      res.status(404).send('Error on aggregating values.');
+    }
+  } catch (e) {
+    res.status(500).send('Error on fetching expenses.');
+  }
+});
 
 /**
  * @desc Update an expense by ID
@@ -116,7 +109,6 @@ router.post('/', async (req, res) => {
     res.send(e.message);
   }
 });
-
 
 /**
  * @desc delete an expense by ID
